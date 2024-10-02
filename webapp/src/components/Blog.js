@@ -1,15 +1,12 @@
+import { memo } from "react";
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-
-const Blog = () => {
+const Blog = memo(() => {
   const navigate = useNavigate();
-  return (
-    <div>
+  return <div>
       <h1>Login</h1>
       <button onClick={() => navigate("/blog/post")}>login</button>
       <Outlet />
-    </div>
-  );
-};
-
+    </div>;
+});
 export default Blog;

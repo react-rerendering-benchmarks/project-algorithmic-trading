@@ -1,6 +1,6 @@
+import { memo } from "react";
 import React, { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-
 import Blog from "./components/Blog";
 import Post from "./components/Post";
 import Dashboard from "./components/Dashboard.tsx";
@@ -19,36 +19,28 @@ import br from "./triangles.svg";
 import "./style.css";
 import "./app.css";
 import { isLoggedIn, logout } from "./services/authentication";
-
-export default function App() {
+export default memo(function App() {
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
-
   const isActive = sessionStorage.activeSession;
   if (!isActive) {
     logout();
     setLoggedIn(false);
   }
-
-  const Nav = () => {
-    return (
-      <div>
+  const Nav = memo(() => {
+    return <div>
         <img className="background" src={br} alt="Background" />
 
-        {loggedIn ? (
-          <div className="nav">
+        {loggedIn ? <div className="nav">
             <Link className="logo" to="/candle">
               Tradester <img src={bull} alt="Logo" />{" "}
             </Link>
             <div className="links">
               <Link to="/candle">Stocks</Link>
               <Link to="/investment">Investment</Link>
-              <Link
-                to="/portfolio"
-                state={{
-                  username: localStorage.getItem("username"),
-                  isSelf: true,
-                }}
-              >
+              <Link to="/portfolio" state={{
+            username: localStorage.getItem("username"),
+            isSelf: true
+          }}>
                 Portfolio
               </Link>
               <Link to="/search">Social</Link>
@@ -57,20 +49,14 @@ export default function App() {
             <div className="menu">
               <Menu />
             </div>
-          </div>
-        ) : (
-          <div className="nav">
+          </div> : <div className="nav">
             <Link className="logo" to="/login">
               Tradester <img src={bull} alt="Logo" />{" "}
             </Link>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  return (
-    <>
+          </div>}
+      </div>;
+  });
+  return <>
       <Nav />
       <div className="overlay">
         <Routes>
@@ -78,53 +64,27 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/post" element={<Post />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route
-            path="/login"
-            element={<Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
-          />
-          <Route
-            path="/logout"
-            element={<Logout setLoggedIn={setLoggedIn} />}
-          />
+          <Route path="/login" element={<Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
+          <Route path="/logout" element={<Logout setLoggedIn={setLoggedIn} />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/investment"
-            element={<Investment loggedIn={loggedIn} />}
-          />
+          <Route path="/investment" element={<Investment loggedIn={loggedIn} />} />
           <Route path="/candle" element={<Candle />} />
-          <Route
-            path="/portfolio"
-            element={
-              <Portfolio
-                username={localStorage.getItem("username")}
-                isSelf={true}
-              />
-            }
-          />
+          <Route path="/portfolio" element={<Portfolio username={localStorage.getItem("username")} isSelf={true} />} />
           <Route path="/search" element={<Search />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/friend-requests" element={<FriendRequests />} />
         </Routes>
       </div>
-    </>
-  );
-}
-
-const HomePage = () => {
+    </>;
+});
+const HomePage = memo(() => {
   let isActive = sessionStorage.activeSession;
-
-  return (
-    <div className="home">
+  return <div className="home">
       <h1>Welcome to Tradester</h1>
-      {sessionStorage.activeSession == "true" ? (
-        <Link className="viewdash" to="/candle">
+      {sessionStorage.activeSession == "true" ? <Link className="viewdash" to="/candle">
           View Dashboard
-        </Link>
-      ) : (
-        <Link className="viewdash" to="/login">
+        </Link> : <Link className="viewdash" to="/login">
           Log In
-        </Link>
-      )}
-    </div>
-  );
-};
+        </Link>}
+    </div>;
+});

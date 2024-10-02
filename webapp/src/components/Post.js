@@ -1,12 +1,9 @@
+import { memo } from "react";
 import React from "react";
 import { Outlet } from "react-router-dom";
-
-const Post = () => {
-  return (
-    <div>
+const Post = memo(() => {
+  return <div>
       <h1>Post Content</h1>
-    </div>
-  );
-};
-
+    </div>;
+});
 export default Post;

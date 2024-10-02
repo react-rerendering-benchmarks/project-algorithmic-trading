@@ -1,20 +1,13 @@
+import { useRef } from "react";
+import { memo } from "react";
 import "./user.css";
 import "./search.css";
 import SocialTabs from "./SocialTabs";
-import {
-  findUserByUsername,
-  hasOutgoingRequest,
-  hasIncomingRequest,
-  isFriendsWith,
-  sendFriendRequest,
-  revokeFriendRequest,
-} from "../../services/friendship";
+import { findUserByUsername, hasOutgoingRequest, hasIncomingRequest, isFriendsWith, sendFriendRequest, revokeFriendRequest } from "../../services/friendship";
 import { useState } from "react";
-
-export default function Search() {
-  const [username, setUserName] = useState("");
+export default memo(function Search() {
+  const username = useRef("");
   const [foundUser, setFoundUser] = useState(null);
-
   const sendRequest = async () => {
     await sendFriendRequest(foundUser.user_id);
     setFoundUser({
@@ -22,10 +15,9 @@ export default function Search() {
       user_id: foundUser.user_id,
       isFriend: foundUser.isFriend,
       incoming_request: foundUser.incoming_request,
-      outgoing_request: true,
+      outgoing_request: true
     });
   };
-
   const revokeRequest = async () => {
     await revokeFriendRequest(foundUser.user_id);
     setFoundUser({
@@ -33,40 +25,32 @@ export default function Search() {
       user_id: foundUser.user_id,
       isFriend: foundUser.isFriend,
       incoming_request: foundUser.incoming_request,
-      outgoing_request: false,
+      outgoing_request: false
     });
   };
-
   const findUser = async () => {
-    let user = await findUserByUsername(username);
+    let user = await findUserByUsername(username.current.value);
     if (!user) {
       setFoundUser(null);
       return;
     }
-
     user.isFriend = await isFriendsWith(user.user_id);
     user.outgoing_request = false;
     user.incoming_request = false;
-
     if (!user.isFriend) {
       user.outgoing_request = await hasOutgoingRequest(user.user_id);
     }
-
     if (!user.isFriend && !user.outgoing_request) {
       user.incoming_request = await hasIncomingRequest(user.user_id);
     }
-
     setFoundUser(user);
   };
-
-  const onEnter = async (e) => {
+  const onEnter = async e => {
     if (e.key === "Enter") {
       findUser();
     }
   };
-
   let userDiv = <div></div>;
-
   if (foundUser) {
     let button = false;
     if (foundUser.isFriend) {
@@ -76,28 +60,15 @@ export default function Search() {
     } else if (!foundUser.incoming_request) {
       button = <button onClick={sendRequest}>Send</button>;
     }
-
-    userDiv = (
-      <div className="user-display">
+    userDiv = <div className="user-display">
         <p>{foundUser.username}</p>
         {button}
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="search">
+  return <div className="search">
       <SocialTabs />
       <h3>Search Users</h3>
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUserName(e.target.value)}
-        className="search-bar"
-        placeholder="Enter username"
-        onKeyDown={onEnter}
-      />
+      <input type="text" ref={username} className="search-bar" placeholder="Enter username" onKeyDown={onEnter} />
       {userDiv}
-    </div>
-  );
-}
+    </div>;
+});
